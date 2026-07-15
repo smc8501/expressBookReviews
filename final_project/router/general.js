@@ -1,8 +1,8 @@
-const express = require('express');
-let books = require("./booksdb.js");
-let isValid = require("./auth_users.js").isValid;
-let users = require("./auth_users.js").users;
-const public_users = express.Router();
+import { Router } from 'express';
+import books from "./booksdb.js";
+import { isValid } from "./auth_users.js";
+import { users } from "./auth_users.js";
+const public_users = Router();
 
 
 public_users.post("/register", (req,res) => {
@@ -10,10 +10,11 @@ public_users.post("/register", (req,res) => {
   return res.status(300).json({message: "Yet to be implemented"});
 });
 
+
+
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+public_users.get('/', async function (req, res) {
+  await res.send(JSON.stringify(books, null, 4));
 });
 
 // Get book details based on ISBN
@@ -40,4 +41,4 @@ public_users.get('/review/:isbn',function (req, res) {
   return res.status(300).json({message: "Yet to be implemented"});
 });
 
-module.exports.general = public_users;
+export const general = public_users;
