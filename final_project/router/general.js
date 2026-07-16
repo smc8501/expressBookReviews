@@ -6,9 +6,18 @@ const public_users = Router();
 
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
-});
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (username && password) {
+    const existingUser = users.find(user => user.username === username);
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already exists" });
+    } else {
+      users.push({ username, password });
+      return res.status(200).json({ message: "User registered successfully" });
+    }
+}});
 
 
 
