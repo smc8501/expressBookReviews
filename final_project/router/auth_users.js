@@ -5,7 +5,7 @@ const regd_users = express.Router();
 
 let users = [];
 
-const isValid = (username)=>{ //returns boolean
+const isValid = (username)=> { //returns boolean
 //write code to check is the username is valid
   let filtered_users = users.filter((user) => user.username === username);
  
@@ -44,7 +44,7 @@ regd_users.post("/login", (req,res) => {
   };
 
   return res.status(200).json({
-    message: "User logged in successfully",
+    message: "Login successful!",
     accessToken
   })
 

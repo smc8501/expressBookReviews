@@ -6,51 +6,131 @@ const public_users = Router();
 
 
 public_users.post("/register", (req,res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-
+  const { username, password } = req.body;
+  const registerPromise = new Promise((resolve, reject) => {
+  if (!username || !password) {
+    reject("Invalid username or password");
+  }
   if (username && password) {
     const existingUser = users.find(user => user.username === username);
     if (existingUser) {
-      return res.status(400).json({ message: "Username already exists" });
+      reject("Username already exists");
     } else {
       users.push({ username, password });
-      return res.status(200).json({ message: "User registered successfully" });
+      resolve("User registered successfully");
     }
-}});
+}
+});
+  registerPromise
+  .then((data) => {
+    return res.status(200).json({message: "User registered successfully"})
+  })
+  .catch((error) => {
+    return res.status(500).json({message: error})
+  });
+ });
 
 
 
 // Get the book list available in the shop
-public_users.get('/', async function (req, res) {
-  await res.send(JSON.stringify(books, null, 4));
+public_users.get('/',  function (req, res) {
+  const bookListPromise =  new Promise((resolve, reject) => {
+    if (!books) {
+      reject("No books found")
+    } else {
+      resolve(JSON.stringify(books))
+    }
+  })
+  bookListPromise
+  .then((data) => {
+    return res.status(200).json({data})
+  })
+  .catch((error) => {
+    return res.status(500).json({message: error})
+  });
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn', async function (req, res) {
+public_users.get('/isbn/:isbn',  function (req, res) {
   const ISBN = req.params.isbn;
-  await res.send(books[ISBN]);
+  
+  const isbnPromise = new Promise((resolve, reject) => {
+    if (!ISBN) {
+      reject("No book found by that ISBN")
+    } else {
+      resolve(JSON.stringify(books[ISBN]))
+    }
+  });
+  isbnPromise
+  .then((data) => {
+    return res.status(200).json({data})
+  })
+  .catch((error) => {
+    return res.status(500).json({message: error})
+  })
   
  });
   
 // Get book details based on author
-public_users.get('/author/:author', async function (req, res) {
+public_users.get('/author/:author',  function (req, res) {
   const author = req.params.author;
   const filteredBooks = Object.values(books).filter(book => book.author === author);
-  await res.send(filteredBooks);
+  
+  const authorPromise = new Promise((resolve, reject) => {
+    if (!filteredBooks) {
+      reject("No Books found by that author")
+    } else {
+      resolve(JSON.stringify(filteredBooks))
+    }
+  });
+  authorPromise
+  .then((data) => {
+    return res.status(200).json({data})
+  })
+  .catch((error) => {
+    return res.status(500).json({message: error})
+  })
 });
 
 // Get all books based on title
-public_users.get('/title/:title', async function (req, res) {
+public_users.get('/title/:title',  function (req, res) {
   const title = req.params.title;
   const filteredBooks = Object.values(books).filter(book => book.title === title);
-  await res.send(filteredBooks);
+  
+  const titlePromise = new Promise((resolve, reject) => {
+    if (!filteredBooks) {
+      reject("No books found by that title")
+    } else {
+      resolve(JSON.stringify(filteredBooks))
+    }
+  });
+  titlePromise
+  .then((data) => {
+    return res.status(200).json({data})
+  })
+  .catch((error) => {
+    return res.status(500).json({message: error})
+  })
 });
 
 //  Get book review
 public_users.get('/review/:isbn', async function (req, res) {
   const ISBN = req.params.isbn;
-  await res.send(books[ISBN].reviews);
+  
+  const reviewISBNPromise = new Promise((resolve, reject) => {
+    if (!ISBN) {
+      reject("No book found by that ISBN")
+    } else {
+      resolve(JSON.stringify(books[ISBN].reviews))
+    }
+  });
+  reviewISBNPromise
+    .then((data) => {
+    return res.status(200).json({data})
+    })
+    .catch((error) => {
+    return res.status(500).json({message: error})
+    })
 });
 
 export const general = public_users;
