@@ -8,7 +8,7 @@ const public_users = Router();
 public_users.post("/register", (req,res) => {
   const { username, password } = req.body;
   const registerPromise = new Promise((resolve, reject) => {
-  if (!username || !password) {
+  if (!username && !password) {
     reject("Invalid username or password");
   }
   if (username && password) {
@@ -17,7 +17,7 @@ public_users.post("/register", (req,res) => {
       reject("Username already exists");
     } else {
       users.push({ username, password });
-      resolve("User registered successfully");
+      resolve("User created successfully");
     }
 }
 });

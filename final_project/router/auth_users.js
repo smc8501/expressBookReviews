@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 let books = require("./booksdb.js");
 const regd_users = express.Router();
+const axios = require('axios');
 
 let users = [];
 
@@ -22,31 +23,53 @@ const authenticatedUser = (username,password)=>{ //returns boolean
       user.password === password
   );
 };
- 
-//only registered users can login
-regd_users.post("/login", (req,res) => {
-  let username = req.body.username;
-  let password = req.body.password;
 
-  if (!authenticatedUser(username, password)){
-    return res.status(403).json({message: "User not authenticated"})
-  } 
-  const user = users.find(user => user.username === username);
-
-  const accessToken = jwt.sign(
-    {username: user.username},
-    "access",
-    {expiresIn: 60*60}
-  );
-  // Store token in session
-  req.session.authorization = {
-    accessToken
+const  generateToken = (user) =>  {
+  const payload = {
+    username: user.username,
+    password: user.password,
+    
   };
 
-  return res.status(200).json({
-    message: "Login successful!",
-    accessToken
-  })
+  const options = {
+    expiresIn: 60*60,
+  };
+
+  const accessToken = jwt.sign(payload, "29389128391283",options);
+
+  return accessToken;
+}
+ 
+//only registered users can login
+regd_users.post("/login", async (req,res) => {
+  const { username, password } = req.body;
+  const loginData = {username, password};
+ 
+
+  try {
+    if (!authenticatedUser(username, password)){
+      return res.status(403).json({message: "User not authenticated"})
+  }
+    const user = users.find(user => user.username === username);
+
+    const accessToken = generateToken(user);
+  // Store token in session
+    req.session.authorization = {
+      accessToken
+    };
+    return res.status(200).json({message: "Login successful!"});
+  } catch(error) {
+    if (error.response) {
+      return res.status(500).json({"Login Failed:": error.response.data.message});
+    } else {
+      return res.status(500).json({"Network/Server Error": error.message});
+    }
+  }
+
+  
+  
+
+  
 
 });
 
